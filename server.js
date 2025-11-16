@@ -79,6 +79,22 @@ const rooms = new Map();
 io.on('connection', (socket) => {
   console.log('[io] connection:', socket.id);
 
+  // in server.js inside io.on('connection', (socket) => { ... })
+
+// Relay live-share events to room
+  socket.on('live-event', (payload) => {
+    // payload must include: { room, type, data, sender }
+    try {
+      const room = payload && payload.room;
+      if (!room) return;
+      // broadcast to everyone else in the room
+      socket.to(room).emit('live-event', payload);
+    } catch (err) {
+      console.error('[live-event] relay error', err);
+    }
+  });
+
+
   // join-room: client sends roomId to join
   socket.on('join-room', (roomId) => {
     try {
