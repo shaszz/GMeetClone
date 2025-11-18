@@ -63,6 +63,15 @@ app.get('/ice', (req, res) => {
   res.json({ iceServers: ice });
 });
 
+// ========================================================
+// FIX: Serve index.html for any unknown route (SPA Fallback)
+// This fixes the "Cannot GET /RoomID" error
+// ========================================================
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+
 // Create Socket.io server attached to the same http server.
 // For development allow CORS "*" but in prod set allowed origins appropriately.
 const io = new Server(server, {
@@ -79,9 +88,7 @@ const rooms = new Map();
 io.on('connection', (socket) => {
   console.log('[io] connection:', socket.id);
 
-  // in server.js inside io.on('connection', (socket) => { ... })
-
-// Relay live-share events to room
+  // Relay live-share events to room
   socket.on('live-event', (payload) => {
     // payload must include: { room, type, data, sender }
     try {
