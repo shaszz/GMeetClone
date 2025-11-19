@@ -211,6 +211,7 @@ function shutdown(signal) {
       console.log('HTTP server closed');
       process.exit(0);
     });
+    
     // Force exit if not closed within 5s
     setTimeout(() => {
       console.warn('Forcing shutdown');
